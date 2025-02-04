@@ -41,7 +41,8 @@ namespace DailyLeetcodeReminder
             using (var scope = builder.ApplicationServices.CreateScope())
             {
                 var botClient = scope.ServiceProvider.GetRequiredService<ITelegramBotClient>();
-                var baseUrl = Environment.GetEnvironmentVariable("BASE_ADDRESS");
+                var baseUrl = configuration
+                    .GetSection("TelegramBot:BaseAddress").Value;
                 var webhookUrl = $"{baseUrl}/bot";
                 var webhookInfo = botClient.GetWebhookInfoAsync().Result;
 

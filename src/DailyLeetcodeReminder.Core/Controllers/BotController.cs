@@ -18,4 +18,8 @@ public class BotController : ControllerBase
 
         return Ok();
     }
+
+    [HttpGet]
+    public string Get()
+        => "Ishlayapti";
 }

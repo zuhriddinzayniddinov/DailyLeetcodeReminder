@@ -1,5 +1,6 @@
 ﻿using DailyLeetcodeReminder.Application.Services;
 using DailyLeetcodeReminder.Core.Services;
+using DailyLeetcodeReminder.Domain.Entities;
 using DailyLeetcodeReminder.Infrastructure.Jobs;
 using DailyLeetcodeReminder.Infrastructure.Contexts;
 using DailyLeetcodeReminder.Infrastructure.Repositories;
@@ -17,8 +18,10 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.Configure<TelegramBotSetting>(configuration
+            .GetSection("TelegramBot"));
 
-        string botApiKey = Environment.GetEnvironmentVariable("BOT_API_KEY");
+        string botApiKey = configuration["TelegramBot:ApiKey"];//Environment.GetEnvironmentVariable("BOT_API_KEY");
 
         services.AddSingleton<ITelegramBotClient, TelegramBotClient>(x => new TelegramBotClient(botApiKey));
 
@@ -39,7 +42,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddDbContextPool<ApplicationDbContext>(options =>
         {
-            string connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
+            string connectionString = configuration.GetConnectionString("PostgresqlConnectionString");//Environment.GetEnvironmentVariable("DATABASE_URL");
 
             var databaseUri = new Uri(connectionString);
             var userInfo = databaseUri.UserInfo.Split(':');
@@ -98,8 +101,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddHttpClient("leetcode", config =>
         {
-            var baseAddress = configuration
-                .GetSection("Leetcode:BaseAddress").Value;
+            var baseAddress = configuration["Leetcode:BaseAddress"];
 
             config.BaseAddress = new Uri(baseAddress);
         });

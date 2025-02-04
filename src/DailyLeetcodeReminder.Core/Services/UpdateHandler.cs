@@ -14,16 +14,19 @@ public class UpdateHandler
     private readonly IChallengerService challengerService;
     private readonly ITelegramBotClient telegramBotClient;
     private readonly ILogger<UpdateHandler> logger;
+    private readonly TelegramBotSetting botSetting;
     private static int pageSize = 10;
 
     public UpdateHandler(
         IChallengerService challengerService,
         ITelegramBotClient telegramBotClient,
-        ILogger<UpdateHandler> logger)
+        ILogger<UpdateHandler> logger,
+        TelegramBotSetting botSetting)
     {
         this.challengerService = challengerService;
         this.telegramBotClient = telegramBotClient;
         this.logger = logger;
+        this.botSetting = botSetting;
     }
 
     public async Task UpdateHandlerAsync(Update update)
@@ -92,7 +95,10 @@ public class UpdateHandler
             return;
         }
 
-        var command = message.Text.Split(' ').First().Substring(1);
+        var command = message.Text.Split(' ').First()[1..];
+        
+        if(command.IndexOf('@') > -1)
+            command = command.Split('@')[0];
 
         try
         {
@@ -113,7 +119,7 @@ public class UpdateHandler
             this.logger.LogError(exception.Message);
 
             await this.telegramBotClient.SendTextMessageAsync(
-                chatId: message.From.Id,
+                chatId: message.Chat.Id,
                 text: "Siz allaqachon ro'yxatdan o'tgansiz");
 
             return;
@@ -123,7 +129,7 @@ public class UpdateHandler
             this.logger.LogError(exception.Message);
 
             await this.telegramBotClient.SendTextMessageAsync(
-                chatId: message.From.Id,
+                chatId: message.Chat.Id,
                 text: "Kechirasiz usernameni tekshirib qayta urining, username topilmadi");
 
             return;
@@ -133,7 +139,7 @@ public class UpdateHandler
             this.logger.LogError(exception.Message);
 
             await this.telegramBotClient.SendTextMessageAsync(
-                chatId: message.From.Id,
+                chatId: message.Chat.Id,
                 text: "Sizning telegram yoki leetcode profilingiz ro'yxatdan o'tgan");
 
             return;
@@ -143,7 +149,7 @@ public class UpdateHandler
             this.logger.LogError(exception.Message);
 
             await this.telegramBotClient.SendTextMessageAsync(
-                chatId: message.From.Id,
+                chatId: message.Chat.Id,
                 text: "Sizning so'rovingizda xatolik yuz berdi. Qayta urinib ko'ring");
 
             return;
@@ -184,7 +190,7 @@ public class UpdateHandler
     private async Task HandleStartCommandAsync(Message message)
     {
         await this.telegramBotClient.SendTextMessageAsync(
-                chatId: message.From.Id,
+                chatId: message.Chat.Id,
                 text: "Daily leetcode botiga xush kelibsiz. " +
                 "Kunlik challenge'da qatnashish uchun, " +
                 "leetcode username'ni /register komandasidan keyin yuboring. " +
@@ -194,7 +200,7 @@ public class UpdateHandler
     private async Task HandleNotAvailableCommandAsync(Message message)
     {
         await this.telegramBotClient.SendTextMessageAsync(
-                chatId: message.From.Id,
+                chatId: message.Chat.Id,
                 text: "Mavjud bo'lmagan komanda kiritildi. " +
                 "Tekshirib ko'ring.");
     }
@@ -203,14 +209,19 @@ public class UpdateHandler
     {
         try
         {
+            if (message.Chat.Type != ChatType.Private)
+            {
+                return;
+            }
+            
             var leetCodeUsername = message.Text?.Split(' ').Skip(1).FirstOrDefault();
 
-            var groupLink = Environment.GetEnvironmentVariable("GROUP_LINK");
+            var groupLink = botSetting.GroupLink;
 
             if (string.IsNullOrWhiteSpace(leetCodeUsername))
             {
                 await this.telegramBotClient.SendTextMessageAsync(
-                    chatId: message.From.Id,
+                    chatId: message.Chat.Id,
                     text: "Iltimos username ni ham kiriting.\n Misol uchun: /register myusername");
 
                 return;
@@ -218,7 +229,7 @@ public class UpdateHandler
 
             var challenger = new Challenger
             {
-                TelegramId = message.From.Id,
+                TelegramId = message.Chat.Id,
                 LeetcodeUserName = leetCodeUsername,
                 FirstName = message.From.FirstName,
                 LastName = message.From.LastName,
@@ -239,7 +250,7 @@ public class UpdateHandler
         catch(NotFoundException)
         {
             await this.telegramBotClient.SendTextMessageAsync(
-                chatId: message.From.Id,
+                chatId: message.Chat.Id,
                 text: "Ushbu username leetcode platformasida mavjud emas");
         }
     }

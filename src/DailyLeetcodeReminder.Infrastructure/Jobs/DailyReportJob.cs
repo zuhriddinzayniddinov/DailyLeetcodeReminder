@@ -16,22 +16,24 @@ public class DailyReportJob : IJob
     private readonly ITelegramBotClient telegramBotClient;
     private readonly ILeetCodeBroker leetcodeBroker;
     private readonly ILogger<DailyReportJob> logger;
+    private readonly TelegramBotSetting botSetting;
 
     public DailyReportJob(
         IChallengerRepository challengerRepository,
         ITelegramBotClient telegramBotClient,
         ILeetCodeBroker leetcodeBroker,
+        TelegramBotSetting botSetting,
         ILogger<DailyReportJob> logger)
     {
         this.challengerRepository = challengerRepository;
         this.telegramBotClient = telegramBotClient;
         this.leetcodeBroker = leetcodeBroker;
+        this.botSetting = botSetting;
         this.logger = logger;
     }
 
     public async Task Execute(IJobExecutionContext context)
     {
-        long groupId = long.Parse(Environment.GetEnvironmentVariable("GROUP_ID"));
         var today = DateTime.Now.Date;
         var yesterday = today.AddDays(-1);
 
@@ -64,12 +66,12 @@ public class DailyReportJob : IJob
                 activeChallenger.Status = UserStatus.Inactive;
 
                 var chatMember = await telegramBotClient
-                    .GetChatMemberAsync(groupId, activeChallenger.TelegramId);
+                    .GetChatMemberAsync(botSetting.GroupId, activeChallenger.TelegramId);
 
                 if(chatMember.Status is not ChatMemberStatus.Administrator and not ChatMemberStatus.Creator)
                 {
                     await RemoveMemberAsync(
-                        groupId,
+                        botSetting.GroupId,
                         activeChallenger.TelegramId);
                 }
             }
@@ -103,7 +105,7 @@ public class DailyReportJob : IJob
         await SendDailyReportAsync(
             telegramBotClient,
             activeChallengers,
-            groupId);
+            botSetting.GroupId);
     }
 
     private async Task SendDailyReportAsync(

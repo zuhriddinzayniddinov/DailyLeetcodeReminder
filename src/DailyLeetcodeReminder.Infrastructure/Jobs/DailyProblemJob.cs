@@ -2,6 +2,7 @@
 using DailyLeetcodeReminder.Infrastructure.Services;
 using Quartz;
 using System.Text;
+using DailyLeetcodeReminder.Domain.Entities;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 
@@ -11,22 +12,22 @@ namespace DailyLeetcodeReminder.Infrastructure.Jobs
     {
         private readonly ILeetCodeBroker leetCodeBroker;
         private readonly ITelegramBotClient telegramBotClient;
+        private readonly TelegramBotSetting botSetting;
 
         public DailyProblemJob(
             ILeetCodeBroker leetCodeBroker,
-            ITelegramBotClient telegramBotClient)
+            ITelegramBotClient telegramBotClient,
+            TelegramBotSetting botSetting)
         {
             this.leetCodeBroker = leetCodeBroker;
             this.telegramBotClient = telegramBotClient;
+            this.botSetting = botSetting;
         }
 
         public async Task Execute(IJobExecutionContext context)
         {
             DailyProblem dailyProblem =
                 await leetCodeBroker.GetDailyProblemAsync();
-
-            long groupId =
-                long.Parse(Environment.GetEnvironmentVariable("GROUP_ID"));
 
             StringBuilder builder = new StringBuilder();
             
@@ -36,11 +37,11 @@ namespace DailyLeetcodeReminder.Infrastructure.Jobs
             builder.AppendLine($"<b>Teglar</b> - {dailyProblem.Tags}");
 
             var message = await telegramBotClient.SendTextMessageAsync(
-                chatId: groupId,
+                chatId: botSetting.GroupId,
                 text: builder.ToString(),
                 parseMode: ParseMode.Html);
 
-            await telegramBotClient.PinChatMessageAsync(groupId, message.MessageId);
+            await telegramBotClient.PinChatMessageAsync(botSetting.GroupId, message.MessageId);
         }
     }
 }
