@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Quartz;
 using Telegram.Bot;
 using Npgsql;
+using Telegram.Bot.Types.Enums;
 
 namespace DailyLeetcodeReminder.Core.Extensions;
 
@@ -159,10 +160,15 @@ public static class ServiceCollectionExtensions
                 var updateHandler = scopeRep.ServiceProvider.GetRequiredService<UpdateHandler>();
                 await updateHandler.UpdateHandlerAsync(update);
             },
-            (bot, exception, token) => HandleErrorAsync(exception),
-            new Telegram.Bot.Polling.ReceiverOptions(),
+            async (bot, exception, token) => await HandleErrorAsync(exception),
+            new Telegram.Bot.Polling.ReceiverOptions
+            {
+                AllowedUpdates = Array.Empty<UpdateType>(),
+                ThrowPendingUpdates = true
+            },
             cancellationToken: CancellationToken.None
         );
+
     }
     private static Task HandleErrorAsync(Exception exception)
     {
