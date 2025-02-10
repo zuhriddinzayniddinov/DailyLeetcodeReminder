@@ -42,22 +42,10 @@ public static class ServiceCollectionExtensions
     {
         services.AddDbContextPool<ApplicationDbContext>(options =>
         {
-            string connectionString = configuration.GetConnectionString("PostgresqlConnectionString");//Environment.GetEnvironmentVariable("DATABASE_URL");
-
-            var databaseUri = new Uri(connectionString);
-            var userInfo = databaseUri.UserInfo.Split(':');
-
-            var builder = new NpgsqlConnectionStringBuilder
-            {
-                Host = databaseUri.Host,
-                Port = databaseUri.Port,
-                Username = userInfo[0],
-                Password = userInfo[1],
-                Database = databaseUri.LocalPath.TrimStart('/')
-            };
-
-            options.UseNpgsql(connectionString: builder.ToString());
+            var connectionString = configuration.GetConnectionString("SqlServerConnectionString");
+            options.UseSqlServer(connectionString);
         });
+
 
         services.AddScoped<IChallengerRepository, ChallengerRepository>();
         services.AddScoped<IAttemptRepository, AttemptRepository>();
@@ -158,5 +146,26 @@ public static class ServiceCollectionExtensions
         services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
         return services;
+    }
+    public static async Task UseTelegramBotAsync(this IServiceProvider serviceProvider)
+    {
+        using var scope = serviceProvider.CreateScope();
+        var botClient = scope.ServiceProvider.GetRequiredService<ITelegramBotClient>();
+
+        botClient.StartReceiving(
+            async (bot, update, token) =>
+            {
+                using var scopeRep = serviceProvider.CreateScope();
+                var updateHandler = scopeRep.ServiceProvider.GetRequiredService<UpdateHandler>();
+                await updateHandler.UpdateHandlerAsync(update);
+            },
+            (bot, exception, token) => HandleErrorAsync(exception),
+            new Telegram.Bot.Polling.ReceiverOptions(),
+            cancellationToken: CancellationToken.None
+        );
+    }
+    private static Task HandleErrorAsync(Exception exception)
+    {
+        return Task.CompletedTask;
     }
 }

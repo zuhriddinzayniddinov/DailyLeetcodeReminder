@@ -3,6 +3,7 @@ using DailyLeetcodeReminder.Infrastructure.Services;
 using Quartz;
 using System.Text;
 using DailyLeetcodeReminder.Domain.Entities;
+using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 
@@ -17,11 +18,11 @@ namespace DailyLeetcodeReminder.Infrastructure.Jobs
         public DailyProblemJob(
             ILeetCodeBroker leetCodeBroker,
             ITelegramBotClient telegramBotClient,
-            TelegramBotSetting botSetting)
+            IOptions<TelegramBotSetting> botSetting)
         {
             this.leetCodeBroker = leetCodeBroker;
             this.telegramBotClient = telegramBotClient;
-            this.botSetting = botSetting;
+            this.botSetting = botSetting.Value;
         }
 
         public async Task Execute(IJobExecutionContext context)

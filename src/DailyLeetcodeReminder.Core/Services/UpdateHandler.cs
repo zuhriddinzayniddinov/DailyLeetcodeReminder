@@ -2,6 +2,7 @@
 using DailyLeetcodeReminder.Domain.Entities;
 using DailyLeetcodeReminder.Domain.Enums;
 using DailyLeetcodeReminder.Domain.Exceptions;
+using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -21,12 +22,12 @@ public class UpdateHandler
         IChallengerService challengerService,
         ITelegramBotClient telegramBotClient,
         ILogger<UpdateHandler> logger,
-        TelegramBotSetting botSetting)
+        IOptions<TelegramBotSetting> botSetting)
     {
         this.challengerService = challengerService;
         this.telegramBotClient = telegramBotClient;
         this.logger = logger;
-        this.botSetting = botSetting;
+        this.botSetting = botSetting.Value;
     }
 
     public async Task UpdateHandlerAsync(Update update)

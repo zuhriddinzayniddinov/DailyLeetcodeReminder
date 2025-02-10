@@ -5,6 +5,7 @@ using DailyLeetcodeReminder.Infrastructure.Services;
 using Microsoft.Extensions.Logging;
 using Quartz;
 using System.Text;
+using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 
@@ -22,13 +23,13 @@ public class DailyReportJob : IJob
         IChallengerRepository challengerRepository,
         ITelegramBotClient telegramBotClient,
         ILeetCodeBroker leetcodeBroker,
-        TelegramBotSetting botSetting,
+        IOptions<TelegramBotSetting> botSetting,
         ILogger<DailyReportJob> logger)
     {
         this.challengerRepository = challengerRepository;
         this.telegramBotClient = telegramBotClient;
         this.leetcodeBroker = leetcodeBroker;
-        this.botSetting = botSetting;
+        this.botSetting = botSetting.Value;
         this.logger = logger;
     }
 

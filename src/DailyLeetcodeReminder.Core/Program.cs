@@ -29,8 +29,9 @@ namespace DailyLeetcodeReminder
             app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
             app.MapControllers();
             
-            SetWebHook(app, builder.Configuration);
-         
+            //SetWebHook(app, builder.Configuration);
+            app.Services.UseTelegramBotAsync().Wait();
+            
             app.Run();
         }
 
@@ -41,7 +42,7 @@ namespace DailyLeetcodeReminder
             using (var scope = builder.ApplicationServices.CreateScope())
             {
                 var botClient = scope.ServiceProvider.GetRequiredService<ITelegramBotClient>();
-                var baseUrl = Environment.GetEnvironmentVariable("BASE_ADDRESS");
+                var baseUrl = configuration["TelegramBot:BaseAddress"];
                 var webhookUrl = $"{baseUrl}/bot";
                 var webhookInfo = botClient.GetWebhookInfoAsync().Result;
 
