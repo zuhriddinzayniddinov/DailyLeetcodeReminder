@@ -200,10 +200,11 @@ public class UpdateHandler
 
     private async Task HandleNotAvailableCommandAsync(Message message)
     {
-        await this.telegramBotClient.SendTextMessageAsync(
-                chatId: message.Chat.Id,
-                text: "Mavjud bo'lmagan komanda kiritildi. " +
-                "Tekshirib ko'ring.");
+        if(message?.Chat is not null)
+            await this.telegramBotClient.SendTextMessageAsync(
+                    chatId: message.Chat.Id,
+                    text: "Mavjud bo'lmagan komanda kiritildi. " +
+                    "Tekshirib ko'ring.");
     }
 
     private async Task HandleRegisterCommandAsync(Message message)
