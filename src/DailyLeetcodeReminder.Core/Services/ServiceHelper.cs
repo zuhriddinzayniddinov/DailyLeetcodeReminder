@@ -10,11 +10,11 @@ public static class ServiceHelper
     {
         var buttons = new List<InlineKeyboardButton>()
         {
-            new InlineKeyboardButton("⏪")
+            new("⏪")
             {
                 CallbackData = $"prev {page}"
             },
-            new InlineKeyboardButton("⏩")
+            new("⏩")
             {
                 CallbackData = $"next {page}"
             }
@@ -40,6 +40,6 @@ public static class ServiceHelper
                 challanger.LeetcodeUserName, challanger.TotalSolvedProblems));
         }
 
-        return builder.ToString() + "</pre>";
+        return builder + "</pre>";
     }
 }
