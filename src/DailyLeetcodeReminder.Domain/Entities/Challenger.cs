@@ -14,6 +14,4 @@ public class Challenger
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
     public virtual ICollection<DailyAttempt> DailyAttempts { get; set; }
-    
-    public byte[] Timestamp { get; set; }
 }
