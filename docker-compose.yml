@@ -1,0 +1,6 @@
+﻿services:
+  dailyleetcodereminder.core:
+    image: dailyleetcodereminder.core
+    build:
+      context: .
+      dockerfile: src/DailyLeetcodeReminder.Core/Dockerfile
