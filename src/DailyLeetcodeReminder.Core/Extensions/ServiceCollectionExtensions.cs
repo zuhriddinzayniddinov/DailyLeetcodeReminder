@@ -43,8 +43,8 @@ public static class ServiceCollectionExtensions
     {
         services.AddDbContextPool<ApplicationDbContext>(options =>
         {
-            var connectionString = configuration.GetConnectionString("SqlServerConnectionString");
-            options.UseSqlServer(connectionString);
+            var connectionString = configuration.GetConnectionString("PostgresqlConnectionString");
+            options.UseNpgsql(connectionString);
         });
 
 

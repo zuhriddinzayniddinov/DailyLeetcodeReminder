@@ -16,14 +16,14 @@ namespace DailyLeetcodeReminder.Infrastructure.Migrations
                 columns: table => new
                 {
                     TelegramId = table.Column<long>(type: "bigint", nullable: false),
-                    LeetcodeUserName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    LeetcodeUserName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Heart = table.Column<short>(type: "smallint", nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    TotalSolvedProblems = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Timestamp = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
+                    FirstName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    LastName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    TotalSolvedProblems = table.Column<int>(type: "integer", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    Timestamp = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -35,8 +35,8 @@ namespace DailyLeetcodeReminder.Infrastructure.Migrations
                 columns: table => new
                 {
                     TelegramId = table.Column<long>(type: "bigint", nullable: false),
-                    TotalSolvedProblems = table.Column<int>(type: "int", nullable: false),
-                    LeetcodeUserName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    TotalSolvedProblems = table.Column<int>(type: "integer", nullable: false),
+                    LeetcodeUserName = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -46,9 +46,9 @@ namespace DailyLeetcodeReminder.Infrastructure.Migrations
                 name: "DailyAttempts",
                 columns: table => new
                 {
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     UserId = table.Column<long>(type: "bigint", nullable: false),
-                    SolvedProblems = table.Column<int>(type: "int", nullable: false)
+                    SolvedProblems = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
