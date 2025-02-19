@@ -4,3 +4,5 @@
     build:
       context: .
       dockerfile: src/DailyLeetcodeReminder.Core/Dockerfile
+    environment:
+      - TZ=Asia/Tashkent
